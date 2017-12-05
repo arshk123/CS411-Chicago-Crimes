@@ -1,4 +1,4 @@
 api/node_modules/*
 api/client/node_modules/*
 api/config/*
-npm-debug.log
+*.log
