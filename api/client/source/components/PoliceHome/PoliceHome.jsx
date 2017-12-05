@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import SearchColumn from '../Search/SearchColumn.jsx'
-import { Button, Input, List } from 'semantic-ui-react'
+import { Button, Input, List, Modal, Header } from 'semantic-ui-react'
 import axios from 'axios';
 import styles from './PoliceHome.scss'
 
@@ -25,12 +25,15 @@ class PoliceHome extends Component {
     this.createListElement = this.createListElement.bind(this)
     this.selectedItem = this.selectedItem.bind(this)
     this.clearSelection = this.clearSelection.bind(this)
+    this.openSearchFilters = this.openSearchFilters.bind(this)
+    this.closeSearchFilters = this.closeSearchFilters.bind(this)
     // case number, description, type, fbi code, time range, arrest made and district id
     this.state = {
       search_query : "",
       results : [],
       selectedItem : false,
-      selectedID : -1
+      selectedID : -1,
+      searchModalOpen : false
     }
     if(this.props.fbi_code) {
       fbicode = this.props.fbi_code
@@ -86,6 +89,18 @@ class PoliceHome extends Component {
     }
   }
 
+  openSearchFilters() {
+    this.setState({
+      searchModalOpen : true
+    })
+  }
+
+  closeSearchFilters() {
+    this.setState({
+      searchModalOpen : false
+    })
+  }
+
   search() {
     var q = this.state.search_query
     console.log("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
@@ -118,8 +133,19 @@ class PoliceHome extends Component {
           <Input focus fluid placeholder="Search" value={this.state.search_query} onChange={this.handleChange}/>
         </div>
         <div className="filter">
-          <Button id="modal-popup"> Search Options </Button>
+          <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
         </div>
+        <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
+          <Header content={"Hey"} />
+          <Modal.Content>
+            <div id="detailView">
+              This is a test popup. also please work.
+            </div>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button secondary content='Close' onClick={this.closeSearchFilters} />
+          </Modal.Actions>
+        </Modal>
         <div className="map">
           <Map data={this.state.results}/>
         </div>
