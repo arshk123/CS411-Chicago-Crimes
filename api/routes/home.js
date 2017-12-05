@@ -5,10 +5,9 @@ module.exports = function (router) {
     var homeRoute = router.route('/');
 
     homeRoute.get(function (req, res) {
-        var connectionString = secrets.token;
+        var connectionString = secrets.db.token;
         res.json({ message: 'My connection string is ' + connectionString });
     });
 
     return router;
 }
-
