@@ -6,13 +6,6 @@ var bodyParser = require('body-parser');
 var secrets = require('./config/secrets');
 var path = require('path');
 
-const client = new pg.Client(secrets)
-client.connect();
-
-client.query('Select count(*) from crimes', (err, res) => {
-	client.end()
-	console.log(res.rows);
-})
 
 
 //import routes (MP3)
@@ -37,5 +30,13 @@ app.use(express.static(`${__dirname}/client/public`));
 app.use(bodyParser.json());
 
 require('./routes')(app, router);
-
+/*
+app.get('*', function (req, res) {
+	res.sendFile(path.resolve(__dirname, 'client/public/index.html'));
+})
+*/
+console.log("listening on port 8280");
 app.listen(8280, "0.0.0.0");
+
+
+
