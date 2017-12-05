@@ -101,7 +101,7 @@ class PoliceHome extends Component {
     })
   }
 
-  search() {
+  ogsearch() {
     var q = this.state.search_query
     console.log("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
     axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
