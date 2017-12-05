@@ -20,14 +20,15 @@ class PoliceLogin extends Component {
   }
 
   loginPolice() {
-    axios.post("http://fa17-cs411-10.cs.illinois.edu:8280/api/login/" + q,
+    console.log("police login")
+    axios.post("http://fa17-cs411-10.cs.illinois.edu:8280/api/login/",
     {
       "username" : this.state.username,
       "password" : this.state.password
     })
     .then(function (response) {
       console.log(JSON.stringify(response))
-      
+
       // this.setState({fbi_code : response.code})
     }.bind(this))
     .catch(function (error) {

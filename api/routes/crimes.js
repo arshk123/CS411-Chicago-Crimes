@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var pg = require('pg');
-var secrets.db = require('../config/secrets');
+var secrets = require('../config/secrets');
 
 module.exports = function(router) {
   /*        router.route('/crimes').get(function(req, res) {
