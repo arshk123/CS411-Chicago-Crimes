@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Checkbox, Form } from 'semantic-ui-react'
+import { Button, Checkbox, Form, Header, Segment, Grid } from 'semantic-ui-react'
 import PoliceHome from '../../PoliceHome/PoliceHome.jsx'
 import axios from 'axios'
+
+import styles from './login.scss'
 
 class PoliceLogin extends Component {
   constructor(props) {
@@ -117,46 +119,67 @@ class PoliceLogin extends Component {
     if(this.state.verCodeInput) {
       return(
         <div>
-          <Form>
-            <Form.Field>
-              <label>Name</label>
-              <input placeholder='First Name' onChange={this.handleUserNameChange}/>
-            </Form.Field>
-            <Form.Field>
-              <label>Password</label>
-              <input placeholder='Last Name' onChange={this.handlePasswordChange}/>
-            </Form.Field>
-            <Form.Field>
-              <label>Verification Code</label>
-              <input placeholder='Verification Code' onChange={this.handleCodeChange}/>
-            </Form.Field>
-            <Button onClick={this.loginPoliceVerify} type='submit'> Submit</Button>
+          <Form size="large">
+            <Form.Input
+              fluid
+              placeholder='Username'
+              onChange={this.handleUserNameChange}
+            />
+          <Form.Input
+            fluid
+            placeholder='Password'
+            onChange={this.handlePasswordChange}
+          />
+         <Form.Input
+              fluid
+              placeholder='Verification Code'
+              onChange={this.handleCodeChange}
+            />
+
+            <Button color='teal' fluid size='large' onClick={this.loginPoliceVerify} type='submit'> Submit</Button>
           </Form>
         </div>
       )
     }
-    let text = ""
+    let text = null
     if(this.state.failedLogin) {
       text = "Invalid Username or Password"
     }
     return (
       <div>
-        <Form>
-          <Form.Field>
-            <label>{text}</label>
-            <label>Name</label>
-            <input placeholder='Username' onChange={this.handleUserNameChange}/>
-          </Form.Field>
-          <Form.Field>
-            <label>Password</label>
-            <input placeholder='Password' onChange={this.handlePasswordChange}/>
-          </Form.Field>
-          <Button onClick={this.loginPolice} type='submit'> Submit</Button>
-          <Button onClick={this.showVerificationInput} type='submit'> Already Have a Code? </Button>
+      <Grid
+      textAlign='center'
+      style={{ height: '100%' }}
+      verticalAlign='middle'
+      >
+      <Grid.Column style={{ maxWidth: 450 }}>
+        <Header as='h2' color='teal' textAlign='center'>
+          {' '}Sign in to your account
+        </Header>
+        <Form size="large">
+          <Segment stacked>
+            <Form.Input
+              fluid
+              placeholder='Username'
+              onChange={this.handleUserNameChange}
+            />
+          <Form.Input
+            fluid
+            placeholder='Password'
+            onChange={this.handlePasswordChange}
+          />
+
+          <Button color='teal' fluid size='large' onClick={this.loginPolice} type='submit'> Submit</Button>
+          <Button color='teal' fluid size='large' onClick={this.showVerificationInput} type='submit'> Already Have a Code? </Button>
+          </Segment>
         </Form>
+         </Grid.Column>
+      </Grid>
       </div>
     )
   }
 }
 
 export default PoliceLogin;
+
+// https://semantic-ui.com/collections/form.html

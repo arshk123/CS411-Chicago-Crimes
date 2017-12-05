@@ -14,12 +14,14 @@ class Login extends Component {
   }
 
   loginPolice() {
-    
+
   }
 
   render() {
     return (
-      <div>
+      <div id="loginParent">
+        <h2> Chicago Crime Tracker </h2>
+        <div id="loginChild">
         <Link to="/civilian">
           <Button onClick={this.loginCivilian}>
             Civilian
@@ -30,6 +32,7 @@ class Login extends Component {
             Police
           </Button>
         </Link>
+      </div>
       </div>
     )
   }
