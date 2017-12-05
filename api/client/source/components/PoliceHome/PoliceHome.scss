@@ -29,7 +29,9 @@
   left: 5px;
 }
 
-
+#scroll-view {
+  overflow-y: auto;
+}
 
 .filter {
   position: relative;

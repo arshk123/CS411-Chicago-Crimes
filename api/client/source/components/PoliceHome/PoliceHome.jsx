@@ -9,6 +9,25 @@ import CrimeCell from '../Search/DataCell/Cell.jsx'
 import Map from '../Map/Map.jsx'
 import CrimeDetailView from '../CrimeDetailView/CrimeDetailView.jsx'
 
+let const_opts = {
+	"id": 0,
+	"crime_id": 0,
+	"case_number": "",
+	"description": "N/A",
+	"time": "0",
+	"type": "",
+	"fbi_code": "0",
+	"arrest_made": false,
+	"district_id": 0,
+	"police_id": 0,
+	"latitude": 0,
+	"longitude": 0,
+	"ward": 0,
+	"beat": 0,
+	"block": "",
+	"crime_index": 0
+}
+
 let type_options = [
     { value: 'OTHER OFFENSE', text: 'Other Offense'},
     { value: 'PROSTITUTION', text: 'Prostitution'},
@@ -99,25 +118,50 @@ class PoliceHome extends Component {
     this.handleDistrictChange = this.handleDistrictChange.bind(this)
     this.handleStreetChange = this.handleStreetChange.bind(this)
     this.ogsearch = this.ogsearch.bind(this)
-    // case number, description, type, fbi code, time range, arrest made and district id
+    this.handleDetailModalOpen = this.handleDetailModalOpen.bind(this)
+    this.handleDetailModalClose = this.handleDetailModalClose.bind(this)
+    this.edit = this.edit.bind(this)
+    this.remove = this.remove.bind(this)
     this.state = {
       search_query : "",
       results : [],
       selectedItem : false,
       selectedID : -1,
       searchModalOpen : false,
+      detailModalOpen : false,
       case_number : "",
       description : "",
       type : "",
-      fbi_code : "",
-      arrest_made : false, 
+      fbi_code : "06",
+      arrest_made : false,
       district : null,
-      street_name : ""
+      street_name : "",
+      selectedData : const_opts
     }
     if(this.props.fbi_code) {
       fbicode = this.props.fbi_code
     }
+    fbicode = "06"
     // this.props.fbi_code must be attached with every request
+  }
+
+  handleDetailModalOpen(data){
+    // selectedItem : data
+    this.setState({
+      detailModalOpen : true,
+      selectedItem : true,
+      selectedID : data["crime_id"],
+      selectedData : data
+    })
+  }
+
+  handleDetailModalClose(){
+    this.setState({
+      detailModalOpen : false,
+      selectedItem : false,
+      selectedID : -1,
+      selectedData : const_opts
+    })
   }
 
   handleCaseChange(event) {
@@ -159,12 +203,8 @@ class PoliceHome extends Component {
     this.setState({street_name : event.target.value});
   }
 
-  selectedItem(id) {
+  selectedItem(data) {
     console.log(id)
-    this.setState({
-      selectedItem : true,
-      selectedID : id
-    })
     console.log("opening")
   }
 
@@ -183,8 +223,9 @@ class PoliceHome extends Component {
       <CrimeCell
         header={data["description"]}
         subheader={data["block"]}
-        selectionTrigger={this.selectedItem}
+        selectionTrigger={() => {this.handleDetailModalOpen(data)}}
         id={data["crime_id"]}
+        data={data}
         />
     )
   }
@@ -216,24 +257,43 @@ class PoliceHome extends Component {
   closeSearchFilters() {
     this.setState({
       searchModalOpen : false
+    },() => {
+      this.search()
     })
   }
 
-  search(event) {
-    var q = JSON.stringify(event.target.value)
-    axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" +  {
-      params: {
-        query : {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district, "block" : this.state.street_name}
-      }
+  search() {
+    // case_number=HZ566343&type=theft&description=OVER&district_id=14&arrest_made=false
+    // TODO write state handlers for dropdown types (district and arrest_made)
+    console.log("searching ")
+    axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes",  {
+      params: {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district}
     })
     .then(function (response) {
       this.setState({
-        movieList : response.data.results,
-        searchQuery : q
+        results : response.data["data"]["rows"]
       })
     }.bind(this))
     .catch(function (error) {
       console.log(error);
+    });
+  }
+
+  edit() {
+
+  }
+
+  remove() {
+    var q = this.state.selectedData["crime_id"]
+    axios.delete("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q, {
+      "id" : q
+    })
+    .then(function (response) {
+      console.log(JSON.stringify(response))
+      this.handleDetailModalClose()
+    }.bind(this))
+    .catch(function (error) {
+      console.log(error)
     });
   }
 
@@ -242,7 +302,7 @@ class PoliceHome extends Component {
     console.log("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
     axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
     .then(function (response) {
-      console.log(JSON.stringify(response.data["data"]["rows"]))
+      // console.log(JSON.stringify(response.data["data"]["rows"]))
       this.setState({
         results : response.data["data"]["rows"]
       })
@@ -253,8 +313,13 @@ class PoliceHome extends Component {
   }
 
   render() {
+    let fbimodal = false
+    if(fbicode != "") {
+      fbimodal = true
+    }
+    fbimodal = true
     var listObjects = (this.state.results).map(this.createListElement)
-    console.log(this.state.selectedItem)
+    if(fbimodal) {
     return (
     <div className="Home">
       <div className="navbar" id="nav">
@@ -274,7 +339,87 @@ class PoliceHome extends Component {
         <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
           <Header content={"Advanced Search Options"} />
           <Modal.Content>
-          <List horizontal link inverted>
+            <div id="scroll-view">
+            <List horizontal link inverted>
+            </List>
+            <h2></h2>
+            <h3>Case Number</h3>
+            <Input focus value={this.state.case_number} onChange={this.handleCaseChange}/>
+            <h3>Description</h3>
+            <Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
+            <h3>Type</h3>
+            <Dropdown placeholder='Type' fluid search selection options={type_options} onChange = {this.handleTypeChange}/>
+            <h3>Fbi Code</h3>
+            <Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
+            <h3>Arrest Made</h3>
+             <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange = {this.handleArrestChange}/>
+            <h3>District ID</h3>
+            <Dropdown placeholder='District' fluid selection options={district_options} onChange = {this.handleDistrictChange}/>
+            <List selection divided inverted relaxed id="movieList">
+            </List>
+            </div>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button secondary content='Search' onClick={this.closeSearchFilters} />
+          </Modal.Actions>
+        </Modal>
+        <div className="map">
+          <Map data={this.state.results}/>
+        </div>
+        <div className="DetailView">
+          <List selection divided inverted relaxed id="movieList">
+            { listObjects }
+          </List>
+        </div>
+      </div>
+      <Modal open={this.state.detailModalOpen} onClose={this.handleDetailModalClose}>
+        <Header content={"Advanced Search Options"} />
+        <Modal.Content>
+          <List horizontal link inverted> </List>
+          <h3>Case Number</h3>
+          <h4>{this.state.selectedData["case_number"]}</h4>
+          <h3>Description</h3>
+          <h4>{this.state.selectedData["description"]}</h4>
+          <h3>Time of Crime</h3>
+          <h4>{this.state.selectedData["time"]}</h4>
+          <h3>Block</h3>
+          <h4>{this.state.selectedData["block"]}</h4>
+          <h3>Crime Index</h3>
+          <h4>{this.state.selectedData["crime_index"]}</h4>
+          <List selection divided inverted relaxed id="movieList"> </List>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button secondary content='Close' onClick={this.handleDetailModalClose} />
+          <Button secondary content='Edit' onClick={this.edit} />
+          <Button secondary content='Delete' onClick={this.remove} />
+        </Modal.Actions>
+      </Modal>
+  </div>
+  // todo change edit and delete buttons
+  )
+  }
+  else {
+    return (
+    <div className="Home">
+      <div className="navbar" id="nav">
+        <Button id="popup-button"> POPUPS </Button>
+        <Button id="carousel-button"> SLIDES </Button>
+        <Button id="video-button"> SHOTS </Button>
+        <Button id="multi-column-button"> BEANS </Button>
+        <Button id="home-button"> HOME </Button>
+      </div>
+      <div className="content-container">
+        <div className="search">
+          <Input focus fluid placeholder="Search" value={this.state.search_query} onChange={this.handleChange}/>
+        </div>
+        <div className="filter">
+          <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
+        </div>
+        <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
+          <Header content={"Advanced Search Options"} />
+          <Modal.Content>
+            <div id="scroll-view">
+            <List horizontal link inverted>
             </List>
             <h2></h2>
             <h3>Case Number</h3>
@@ -293,6 +438,7 @@ class PoliceHome extends Component {
             <Input focus value={this.state.street_name} onChange={this.handleStreetChange}/>
             <List selection divided inverted relaxed id="movieList">
             </List>
+            </div>
           </Modal.Content>
           <Modal.Actions>
             <Button secondary content='Search' onClick={this.closeSearchFilters} />
@@ -307,11 +453,34 @@ class PoliceHome extends Component {
           </List>
         </div>
       </div>
-      <CrimeDetailView
-          mSelected={this.state.selectedItem}
-          clearSelection={this.clearSelection}/>
-    </div>
+      <Modal open={this.state.detailModalOpen} onClose={this.handleDetailModalClose}>
+        <Header content={"Advanced Search Options"} />
+        <Modal.Content>
+          <List horizontal link inverted> </List>
+          <h3>Case Number</h3>
+          <h4>{this.state.selectedData["case_number"]}</h4>
+          <h3>Description</h3>
+          <h4>{this.state.selectedData["description"]}</h4>
+          <h3>Time of Crime</h3>
+          <h4>{this.state.selectedData["time"]}</h4>
+          <h3>Block</h3>
+          <h4>{this.state.selectedData["block"]}</h4>
+          <h3>Crime Index</h3>
+          <h4>{this.state.selectedData["crime_index"]}</h4>
+          <List selection divided inverted relaxed id="movieList"> </List>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button secondary content='Close' onClick={this.handleDetailModalClose} />
+        </Modal.Actions>
+      </Modal>
+  </div>
+  // todo change edit and delete buttons
   )
+  }
+  // <CrimeDetailView
+  //     mSelected={this.state.selectedItem}
+  //     clearSelection={this.clearSelection}/>
+
   }
 }
 

@@ -7,10 +7,11 @@ class PoliceLogin extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      name : "",
+      username : "",
       password : "",
       valid_login : false,
-      fbi_code : ""
+      fbi_code : "",
+      email_auth : false
     }
 
     this.loginPolice = this.loginPolice.bind(this);
@@ -26,7 +27,8 @@ class PoliceLogin extends Component {
     })
     .then(function (response) {
       console.log(JSON.stringify(response))
-      this.setState({fbi_code : response.code})
+      
+      // this.setState({fbi_code : response.code})
     }.bind(this))
     .catch(function (error) {
       console.log(error)
@@ -40,15 +42,11 @@ class PoliceLogin extends Component {
 
   handlePasswordChange(event) {
     console.log(event.target.value)
-    this.setState({fbi_code : event.target.value});
+    this.setState({password : event.target.value});
   }
 
   render() {
-    if(this.state.fbi_code != "") {
-      return (
-        <PoliceHome fbi_code={this.state.fbi_code} />
-      )
-    }
+
     return (
       <div>
         <Form>
