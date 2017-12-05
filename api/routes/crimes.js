@@ -29,7 +29,7 @@ router.route('/crimes').get(function(req,res) {
     if(our_query!='SELECT * FROM crimes where '){
       our_query += ' AND '
     }
-    our_query+=`description LIKE \'\%${req.query.description}\%\'`
+    our_query+=`description LIKE UPPER(\'\%${req.query.description}\%\')`
   }
   if(req.query['type']!=''){
     if(our_query!='SELECT * FROM crimes where '){
@@ -89,6 +89,30 @@ router.route('/crimes/:type').get(function(req, res) {
   client.connect();
   console.log(`SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' LIMIT 25`)
   client.query(`SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' LIMIT 25`, (err, response) => {
+    client.end()
+    if(!err) {
+      console.log(response)
+      res.status(200).send({
+        message : 'ok',
+        data: response
+      })
+    }
+    else {
+      res.status(500).send({
+        message: err,
+        data : []
+      })
+    }
+  })
+})
+
+router.route('/crimes/:id_details').get(function(req, res) {
+  console.log("here");
+  type = req.params.type.toUpperCase();
+  var client = new pg.Client(secrets.db);
+  client.connect();
+  console.log(`SELECT *, beat_get_minmax_time_safeties(beat), district_get_minmax_time_safeties(district_id) FROM crimes WHERE id=${id_details};`)
+  client.query(`SELECT *, beat_get_minmax_time_safeties(beat), district_get_minmax_time_safeties(district_id) FROM crimes WHERE id=${id_details};`, (err, response) => {
     client.end()
     if(!err) {
       console.log(response)
