@@ -38,7 +38,7 @@ class CrimeDetailView extends Component {
     if(this.props.mSelected) {
       return(
         <Modal open={this.state.modalOpen} onClose={this.handleClose}>
-          <Header content={"Hey"} />
+          <Header content={"TEST"} />
           <Modal.Content>
             <div id="detailView">
               This is a test popup. also please work.

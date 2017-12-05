@@ -35,9 +35,9 @@ router.route('/crimes').get(function(req,res) {
     if(our_query!='SELECT * FROM crimes where '){
       our_query += ' AND '
     }
-    our_query+=`LOWER(type)=\'${req.query.type}\'`
+    our_query+=`type=\'${req.query.type}\'`
   }
-  if(req.query['arrest_made']!=''){
+  if(req.query['arrest_made']!=undefined){
     if(our_query!='SELECT * FROM crimes where '){
       our_query += ' AND '
     }

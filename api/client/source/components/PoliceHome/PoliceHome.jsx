@@ -132,8 +132,8 @@ class PoliceHome extends Component {
       case_number : "",
       description : "",
       type : "",
-      fbi_code : "06",
-      arrest_made : false,
+      fbi_code : "",
+      arrest_made : null,
       district : null,
       street_name : "",
       selectedData : const_opts
@@ -169,9 +169,9 @@ class PoliceHome extends Component {
     this.setState({case_number : event.target.value});
   }
 
-  handleTypeChange(event) {
-    console.log(event.target.value)
-    this.setState({type : event.target.value});
+  handleTypeChange(event, data : any) {
+    console.log(data.value)
+    this.setState({type : data.value});
   }
 
   handleDescriptionChange(event) {
@@ -179,9 +179,10 @@ class PoliceHome extends Component {
     this.setState({description : event.target.value});
   }
 
-  handleArrestChange(event) {
+  handleArrestChange(event, data : any) {
+    console.log(data.value)
     let bo = false
-    if(event.target.value === "true") {
+    if(data.value === "True") {
       bo = true
     }
     else {
@@ -195,8 +196,9 @@ class PoliceHome extends Component {
     this.setState({fbi_code : event.target.value});
   }
 
-  handleDistrictChange(event) {
-    this.setState({district : event.target.value});
+  handleDistrictChange(event, data : any) {
+    console.log(data.value)
+    this.setState({district : data.value});
   }
 
   handleStreetChange(event) {
@@ -250,7 +252,14 @@ class PoliceHome extends Component {
 
   openSearchFilters() {
     this.setState({
-      searchModalOpen : true
+      searchModalOpen : true,
+      case_number : "",
+      description : "",
+      type : "",
+      fbi_code : "",
+      arrest_made : null,
+      district : null,
+      street_name : ""
     })
   }
 
@@ -272,6 +281,7 @@ class PoliceHome extends Component {
     .then(function (response) {
       this.setState({
         results : response.data["data"]["rows"]
+
       })
     }.bind(this))
     .catch(function (error) {
@@ -348,13 +358,13 @@ class PoliceHome extends Component {
             <h3>Description</h3>
             <Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
             <h3>Type</h3>
-            <Dropdown placeholder='Type' fluid search selection options={type_options} onChange = {this.handleTypeChange}/>
+            <Dropdown placeholder='Type' fluid selection options={type_options} onChange={this.handleTypeChange.bind(this)}/>
             <h3>Fbi Code</h3>
             <Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
             <h3>Arrest Made</h3>
-             <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange = {this.handleArrestChange}/>
+             <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange={this.handleArrestChange.bind(this)}/>
             <h3>District ID</h3>
-            <Dropdown placeholder='District' fluid selection options={district_options} onChange = {this.handleDistrictChange}/>
+            <Dropdown placeholder='District' fluid selection options={district_options} onChange={this.handleDistrictChange.bind(this)}/>
             <List selection divided inverted relaxed id="movieList">
             </List>
             </div>
