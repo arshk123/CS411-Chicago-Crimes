@@ -1,0 +1,76 @@
+.navbar {
+  overflow: hidden;
+  background-color: black;
+  position: relative;
+  padding: 10px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10%;
+  opacity: 80%;
+
+  h1,h2, h3 {
+    color: white;
+    float: left;
+    margin-left: 30px;
+    vertical-align:middle;
+    margin-top:0px;
+    margin-bottom:0px;
+  }
+}
+
+.search{
+  position: relative;
+  width: 50%;
+  height: 10%;
+  float: left;
+  display: block;
+  top: 5px;
+  left: 5px;
+}
+
+
+
+.filter {
+  position: relative;
+  width: 30%;
+  height: 10%;
+  float: right;
+  top: 5px;
+  display: block;
+}
+
+.map {
+  position: relative;
+  float: left;
+  width: 56%;
+  height: 78%;
+  margin: 2%;
+  background-color: red;
+}
+
+.content-container {
+  position: absolute;
+  height: 90%;
+  width: 100%;
+}
+
+.content {
+  width: 100%;
+}
+
+.DetailView {
+  position: relative;
+  float: right;
+  background-color: black;
+  width: 36%;
+  height: 78%;
+  margin: 2%;
+  overflow-y: auto;
+}
+
+.home {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}

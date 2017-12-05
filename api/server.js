@@ -1,0 +1,41 @@
+var express = require('express');
+var pg = require("pg");
+var app = express();
+var router = express.Router()
+var bodyParser = require('body-parser');
+var secrets = require('./config/secrets');
+var path = require('path');
+
+const client = new pg.Client(secrets)
+client.connect();
+
+client.query('Select count(*) from crimes', (err, res) => {
+	client.end()
+	console.log(res.rows);
+})
+
+
+//import routes (MP3)
+//setup routes (MP3)
+
+var route = require('./routes/index.js');
+var allowCrossDomain = function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+    next();
+};
+
+app.use(allowCrossDomain);
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+app.use(express.static(`${__dirname}/client/public`));
+
+app.use(bodyParser.json());
+
+require('./routes')(app, router);
+
+app.listen(8280, "0.0.0.0");

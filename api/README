@@ -1,0 +1,11 @@
+Running server.js off of PM2 
+https://www.godaddy.com/help/set-up-nodejs-application-for-production-fedora-17353
+
+running on nginx reverse proxy
+https://www.godaddy.com/help/set-up-nodejs-application-for-production-fedora-17353
+
+TODO 
+Build client and serve from api
+finish routes
+finish client
+
