@@ -263,7 +263,7 @@ class PoliceHome extends Component {
             <h3>Description</h3>
             <Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
             <h3>Type</h3>
-            <Dropdown placeholder='Type' fluid selection options={type_options} onChange = {this.handleTypeChange}/>
+            <Dropdown placeholder='Type' fluid search selection options={type_options} onChange = {this.handleTypeChange}/>
             <h3>Fbi Code</h3>
             <Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
             <h3>Arrest Made</h3>
