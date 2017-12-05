@@ -98,6 +98,7 @@ class PoliceHome extends Component {
     this.handleFbiChange = this.handleFbiChange.bind(this)
     this.handleDistrictChange = this.handleDistrictChange.bind(this)
     this.handleStreetChange = this.handleStreetChange.bind(this)
+    this.ogsearch = this.ogsearch.bind(this)
     // case number, description, type, fbi code, time range, arrest made and district id
     this.state = {
       search_query : "",
@@ -200,7 +201,7 @@ class PoliceHome extends Component {
         search_query : event.target.value
       }, () => {
         // query search
-        this.search()
+        this.ogsearch()
         console.log(this.state.search_query)
       })
     }
@@ -218,7 +219,25 @@ class PoliceHome extends Component {
     })
   }
 
-  search() {
+  search(event) {
+    var q = JSON.stringify(event.target.value)
+    axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" +  {
+      params: {
+        query : {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district, "block" : this.state.street_name}
+      }
+    })
+    .then(function (response) {
+      this.setState({
+        movieList : response.data.results,
+        searchQuery : q
+      })
+    }.bind(this))
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  ogsearch() {
     var q = this.state.search_query
     console.log("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
     axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
