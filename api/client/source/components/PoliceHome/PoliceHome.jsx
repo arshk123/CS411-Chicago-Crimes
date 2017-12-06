@@ -29,7 +29,6 @@ let const_opts = {
 }
 
 let type_options = [
-    { value: '', text: 'Search'},
     { value: 'OTHER OFFENSE', text: 'Other Offense'},
     { value: 'PROSTITUTION', text: 'Prostitution'},
     { value: 'THEFT', text: 'Theft'},
