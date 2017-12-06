@@ -83,41 +83,14 @@ router.route('/crimes').get(function(req,res) {
   })
 })
 
-router.route('/crimes/:type').get(function(req, res) {
-  console.log("here");
-  type = req.params.type.toUpperCase();
-  var client = new pg.Client(secrets.db);
-  client.connect();
-  q = 'SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' ORDER BY TYPE LIMIT 25'
-  if(type === "") {
-    q = 'SELECT * FROM crimes ORDER BY time DESC LIMIT 25'
-  }
-  console.log(q)
-  client.query(q, (err, response) => {
-    client.end()
-    if(!err) {
-      console.log(response)
-      res.status(200).send({
-        message : 'ok',
-        data: response
-      })
-    }
-    else {
-      res.status(500).send({
-        message: err,
-        data : []
-      })
-    }
-  })
-})
-
 router.route('/crimes/:id_details').get(function(req, res) {
   console.log("here");
-  type = req.params.type.toUpperCase();
+  id = req.params.id;
   var client = new pg.Client(secrets.db);
   client.connect();
-  console.log(`SELECT *, beat_get_minmax_time_safeties(beat), district_get_minmax_time_safeties(district_id) FROM crimes WHERE id=${id_details};`)
-  client.query(`SELECT *, beat_get_minmax_time_safeties(beat), district_get_minmax_time_safeties(district_id) FROM crimes WHERE id=${id_details};`, (err, response) => {
+
+  console.log(`SELECT crimes.id, crimes.crime_id, crimes.case_number, crimes.description, crimes.time, crimes.type, crimes.fbi_code, crimes.arrest_made, crimes.district_id, police.name AS police_name, crimes.latitude, crimes.longitude, crimes.ward, crimes.beat, crimes.block, crimes.crime_index, beat_get_minmax_time_safeties(crimes.beat), district_get_minmax_time_safeties(crimes.district_id) FROM crimes INNER JOIN police ON (crimes.police_id = police.police_id) WHERE id=${id_details};`)
+  client.query(`SELECT crimes.id, crimes.crime_id, crimes.case_number, crimes.description, crimes.time, crimes.type, crimes.fbi_code, crimes.arrest_made, crimes.district_id, police.name AS police_name, crimes.latitude, crimes.longitude, crimes.ward, crimes.beat, crimes.block, crimes.crime_index, beat_get_minmax_time_safeties(crimes.beat), district_get_minmax_time_safeties(crimes.district_id) FROM crimes INNER JOIN police ON (crimes.police_id = police.police_id) WHERE id=${id_details};`, (err, response) => {
     client.end()
     if(!err) {
       console.log(response)
