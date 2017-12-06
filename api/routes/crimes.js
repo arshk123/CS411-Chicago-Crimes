@@ -58,13 +58,14 @@ router.route('/crimes').get(function(req,res) {
   }
   console.log(our_query);
   if(our_query === 'SELECT * FROM crimes where ') {
-    res.status(200).send({
-      message: 'ok',
-      data: [{"data" : { "rows" : []}}]
-    })
+    // res.status(200).send({
+    //   message: 'ok',
+    //   data: [{"data" : { "rows" : []}}]
+    // })
+    our_query = 'SELECT * FROM crimes ORDER BY time DESC LIMIT 25'
   }
   // Execute query
-  client.query(our_query + ' LIMIT 25;', (err, response) => {
+  client.query(our_query + ' ORDER BY time DESC LIMIT 25;', (err, response) => {
     client.end()
     if(!err) {
       console.log(response)
