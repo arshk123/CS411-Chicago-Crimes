@@ -29,6 +29,7 @@ let const_opts = {
 }
 
 let type_options = [
+    { value: '', text: 'Search'},
     { value: 'OTHER OFFENSE', text: 'Other Offense'},
     { value: 'PROSTITUTION', text: 'Prostitution'},
     { value: 'THEFT', text: 'Theft'},
@@ -250,6 +251,24 @@ class PoliceHome extends Component {
     }
   }
 
+  handleOuterTypeChange(event, data : any) {
+    if(data.value === "") {
+      this.setState({
+        search_query :  "",
+        results : []
+      })
+    }
+    else {
+      this.setState({
+        search_query : data.value
+      }, () => {
+        // query search
+        this.ogsearch()
+        console.log(this.state.search_query)
+      })
+    }
+  }
+
   openSearchFilters() {
     this.setState({
       searchModalOpen : true,
@@ -341,7 +360,8 @@ class PoliceHome extends Component {
       </div>
       <div className="content-container">
         <div className="search">
-          <Input focus fluid placeholder="Search" value={this.state.search_query} onChange={this.handleChange}/>
+          {/*<Input focus fluid placeholder="Search" value={this.state.search_query} onChange={this.handleChange}/>*/}
+          <Dropdown placeholder='Search' fluid search selection options={type_options} onChange={this.handleOuterTypeChange.bind(this)}/>
         </div>
         <div className="filter">
           <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
@@ -358,7 +378,7 @@ class PoliceHome extends Component {
             <h3>Description</h3>
             <Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
             <h3>Type</h3>
-            <Dropdown placeholder='Type' fluid selection options={type_options} onChange={this.handleTypeChange.bind(this)}/>
+            <Dropdown placeholder='Type' fluid search selection options={type_options} onChange={this.handleTypeChange.bind(this)}/>
             <h3>Fbi Code</h3>
             <Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
             <h3>Arrest Made</h3>
