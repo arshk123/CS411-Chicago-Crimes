@@ -18,53 +18,48 @@ var transporter = nodemailer.createTransport({
 
 module.exports = function(router) {
   router.route('/login').post(function(req,res) {
-//	console.log(req.query);
-//	console.log(req)
-//	console.log(req.body);
-	if("username" in req.body) {
-		req.query = req.body
-	}
+    //	console.log(req.query);
+    //	console.log(req)
+    //	console.log(req.body);
+    if("username" in req.body) {
+      req.query = req.body
+    }
     if("email_verification" in req.query) {
-	console.log("verifying");
+      console.log("verifying");
       var client = new pg.Client(secrets.db);
-	client.connect();
-//	console.log(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\' and email_verification = ${req.query.email_verification}`);
-	//console.log("querying");
+      client.connect();
+      console.log(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\' and email_verification = ${req.query.email_verification}`);
       client.query(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\' and email_verification = ${req.query.email_verification}`, (err, response) => {
-	//console.log(response.rows);
-	//console.log(response.rowCount)
         if(err || response.rows.length < 1) {
-	  console.log("error")
+          console.log("error")
           res.status(401).send({
-
-            message : "err",
+            message : "err unable to verify",
             data: []
           })
         }
         else {
-	console.log("ok");
+          console.log("ok");
           // send ok
-          client.query(`Update police set email_verification=null WHERE username=\'${req.query.username}\', (e, r) {
-		
-	  }`);
+          client.query(`Update police set email_verification=null WHERE username=\'${req.query.username}\'`, (e,r)=>{
+		console.log("removed");
+});
           res.status(200).send({
-            message: "Verification code sent",
+            message: "Verification code validated",
             data : response.rows
           })
           // else send failed message with 200
         }
-	client.end()
       })
     }
     else {
-//      console.log(req.query)
+      //      console.log(req.query)
       var client = new pg.Client(secrets.db);
       client.connect()
       //console.log(`Select * FROM police WHERE username = \'${req.query.username}\'`)
       client.query(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\'`, (err, response) => {
-//	console.log(response)
-	console.log(response.rows);
-	console.log(response.rowCount);
+        //	console.log(response)
+        console.log(response.rows);
+        console.log(response.rowCount);
         if(err || response.rowCount != 1) {
           res.status(401).send({
             message : err,
@@ -104,7 +99,7 @@ module.exports = function(router) {
                 message: "Verification code sent",
                 data : []
               })
-		client.end()
+      //        client.end()
             }
           })
         }
@@ -113,29 +108,3 @@ module.exports = function(router) {
   })
   return router
 }
-
-  // //verify code here
-  // router.route('/login/verify').post(function(req,res) {
-  //   var client = new pg.Client(secrets.db);
-  //   client.query(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\' and email_verification = ${req.query.email_verification}`, (err, response) => {
-  //     if(err || response.rows.length === 0) {
-  //       res.status(500).send({
-  //         message : "err",
-  //         data: []
-  //       })
-  //     }
-  //     else {
-  //       // send ok
-  //       res.status(200).send({
-  //         message: "Verification code sent",
-  //         data : response.rows
-  //       })
-  //       // else send failed message with 200
-  //     }
-  //   }, ()=> {
-  //     client.end()
-  //   })
-  //   // })
-  //
-  //   return router
-  // }

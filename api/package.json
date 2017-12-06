@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
+    "nodemailer": "^4.4.0",
     "pg-client": "0.0.5"
   }
 }

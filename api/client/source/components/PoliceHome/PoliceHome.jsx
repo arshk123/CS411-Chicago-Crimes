@@ -170,9 +170,10 @@ class PoliceHome extends Component {
 			fbicode = this.props.fbi_code
 		}
 		fbicode = ""
+		this.ogsearch();
 		// this.props.fbi_code must be attached with every request
-		this.ogsearch()
-	}
+		}
+		//this.ogsearch();
 
 	openEdit() {
 		this.setState({
@@ -579,6 +580,16 @@ class PoliceHome extends Component {
 		});
 	}
 
+        getTimeFromString(the_str) {
+            var curr = the_str.slice(1, -1);
+            curr = curr.split(",");
+            curr[0] += ":00"
+            curr[1] += ":00"
+            curr = "Minimum crime starting hour is " + curr[0] + ", maximum crime starting hour is " + curr[1] + "\n";
+            console.log(curr)
+            return curr
+        }
+
 	render() {
 		document.body.classList.add('scrolling', 'dimmable', 'dimmed');
 		let fbimodal = false
@@ -700,10 +711,10 @@ class PoliceHome extends Component {
 								<h4>{this.state.selectedData["crime_index"]}</h4>
 								<h3>Reporting Police Officer</h3>
 								<h4>{this.state.selectedPoliceOfficer}</h4>
-								<h3>Beat Minimum and Maximum Crime Index</h3>
-								<h4>{this.state.selectedBeatMinMax}</h4>
-								<h3>Location Minimum and Maximum Crime</h3>
-								<h4>{this.state.selectedDistrictMinMax}</h4>
+								<h3>Beat Minimum and Maximum Crime Times (starting hours)</h3>
+								<h4>{this.getTimeFromString(this.state.selectedBeatMinMax)}</h4>
+								<h3>District Minimum and Maximum Crime Times (starting hours)</h3>
+								<h4>{this.getTimeFromString(this.state.selectedDistrictMinMax)}</h4>
 								<List selection divided inverted relaxed id="movieList"> </List>
 							</Modal.Content>
 							<Modal.Actions>

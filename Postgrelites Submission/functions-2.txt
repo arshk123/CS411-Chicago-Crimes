@@ -1,0 +1,158 @@
+Tables:
+We use three main tables and two tables as caches:
+The cache tables are beat_minmax_value and district_minmax_value. These are used to cache the time minmax values (there's a description of this below in the functions section).
+1. crimes:
+    This table contains all the information about each crime. This includes the case number, description, type, location, officer id, etc. This table also includes the crime index, which is calculated based on two things: the severity of the crime and the time of day at which it took place.
+
+    This table has the following constraints on it:
+        crimes_crime_id_key - This makes sure that the crime id (this is distinct from our database id, it's a value from the original table) is unique
+
+        case_number_key - This makes sure that the case number is unique. This was an interesting constraint to implement because the data had a number of duplicate rows, and we weren't checking uniqueness when initially inserting into the table. However, we solved it by running a DELETE FROM ... USING query, which wasn't something we had used before.
+        district_chk - This makes sure that the district field is valid
+
+        latlngchk - This makes sure the latitude and longitude are actually in chicago (there's a bit of wiggle room here)
+
+        time_chk - Since all of our data is from 2012 onwards, this makes sure that no data is entered before that date
+
+        type_chk - There are a finite number of possible types, so this makes sure that a crime entered has a valid type
+
+        police_fk - This makes sure that the police_id in crimes actually exists in our police table
+
+    This table has the following triggers on it:
+        insert_crime_index_trigger - This trigger updates the crime index when a new record is inserted into the table
+
+        update_crime_index_trigger - This trigger updates the crime index when either the type, time, or both are changed for a record
+
+        insert_crimes_time_minmax_values - This trigger updates the district_minmax_values and beat_minmax_values for the district and beat of the inserted value
+
+        update_crimes_time_minmax_values - This trigger updates the district_minmax_values and beat_minmax_values for the district and beat when the type is changed
+
+2. userinfo:
+    This table contains all the user information, including username, email address, password, and name.
+
+    This table has the following constraints on it:
+        email_key - This makes sure the email is unique
+
+        username_key - This makes sure the username is unique
+
+3. police:
+    This table is used to represent the police information. Police are still users, so this table inherits the columns and constraints from there in addition to the ones below.
+
+    This table has the following constraints on it:
+        police_badge_id_key - This makes sure the badge id is unique
+
+        police_police_id_key - This makes sure the police id is unique
+
+    This table has the following triggers on it:
+        delete_police_crimes_trigger - This trigger goes through the crimes database when a police user is deleted from the table and removes the crimes associated with the user in order to not break the foreign key constraint
+
+        update_police_crimes_trigger - This trigger does the same as the above, except when the police_id is changed instead of when the entire row is deleted
+
+
+Stored procedures:
+Below are the main stored procedures we created. There are also some helper functions but we've just included the main ones here.
+
+get_crime_severity(crime varchar(50))
+    Gets the severity (out of 10) of a crime with type crime (must be uppercase)
+
+get_time_severity(check_time time)
+    Gets the severity (out of 6) of a crime at time check_time
+
+get_date_weight(calc_date date)
+    Gets the weight of a date (to be used in safest times), goes from 1 to 4.5 where 1 is 2012-01-01 and 4.5 is the current date
+
+update_record_severity(crime_id_record integer, crime_type varchar(50), crime_time time)
+    Update the crime index for the crime with an id of crime_id_record, type of crime_type and time of crime_time. This is weighted more heavily by the type of crime than by the time, and is scaled to be between 0 and 1, where 0 is the lowest severity and 1 is the highest severity.
+
+crime_severity_trigger()
+    This function is required when using triggers in PostgreSQL, and essentially forms a wrapper for update_record_severity using the trigger information
+
+get_district_time_index(start_time time, time_duration interval, curr_dist_id int)
+    Gets the "time index", which is essentially the severity of the crimes in the specified district during the time period starting at start_time and lasting time_duration (e.g. 00:00 - 03:00). This uses the crime index, but discards the scaling by time of crime since we are looking at a specific time period and we want the crimes to be scaled the same way for comparison. Then we scale the values of the crime indexes by how recent of a date it is using "get_date_weight".
+
+get_beat_time_index(start_time time, time_duration interval, curr_beat int)
+    Same as the above but for a beat
+
+district_get_time_safety_values(curr_dist_id integer)
+    Gets an array of values of size 24 for the district specified, where arr[0] = time_index from 00:00 - 01:00, and similar until arr[23] = time index from 23:00 - 24:00
+
+beat_get_time_safety_values(curr_beat integer)
+    Same as the above but for a beat
+
+district_get_minmax_time_safeties(curr_dist_id int)
+    This gets two values, the first one is the starting time for the safest hour, and the second is the starting time for the least safe hour in that district
+
+beat_get_minmax_time_safeties(curr_beat int)
+    Same as the above but for a beat
+
+district_update_minmax_time_safeties(curr_dist_id int)
+    This updates the district_minmax_values table for the specified district id
+
+beat_update_minmax_time_safeties(curr_beat int)
+    Same as the above but for a beat
+
+crimes_minmax_update_trigger()
+    Required for trigger
+
+
+Database techniques used:
+Approximate query processing - used in search for the description field
+Triggers - used to update crime indexes and safest times on insert/update into crimes
+Stored procedures - used heavily in crime index and safest times (adv. funct.)
+Constraints - used to verify fields in crime, userinfo and police
+Compound statements - Large statements used in querying and crime index/safest times
+
+
+Functionality:
+Crime index (more of a precomputation to safest times)
+	This feature was deemed relevant because it gave ranking for each of the crimes, from a scale of 0-1 about how bad the 
+	crime was. The ability for police to see which crimes are considered to be worse than others allows them to much 
+	better focus on high value crimes, while easily knowing what the high value crimes really are . 
+
+	On a crime insertion or update and you change its time or type then there is a trigger that automatically calculates 
+	the value of the crime based on its type and time of day that the crime occured. We found these to be the defining 
+	characteristics of the value of a crime because a crime committed in broad daylight presumably contains a far 
+	more dangerous person than a crime committed at night. So after every insertion the value is automatically calculated and is
+	inserted into the row containing the crime. 
+
+	This was an advanced feature because we had to preprocess all of the data to give weights to different types of crimes 
+	different times of day that crime occurs. Then on insertion and update it triggers a stored procedure, both of which are advanced 
+	techniques. Overall, the amount of data preprocessing that has to be done and the automatic updates whenever crimes are inserted 
+	or changed, makes this feature advanced. 
+
+Safest times (Adv. Funct.)
+	This feature was necessary for civilians who are trying to navigate the city. They may not know when the safest time to 
+	be in certain areas is, so by calculating the safest time for an area we are allowing them to better plan their day and make 
+	sure that they don't have to worry about being a victim in a crime, just because they didn't know the safety of the neighborhood 
+	that they were in. 
+
+	We find the safest times by first taking the crime index and then we take the date of the crime and reweigh the crimes based on how recent they 
+	are where more recent crimes are weighed more heavily than less recent crimes, because obviously newer crimes should worry us more 
+	than a crime that happened 2 years ago. We scale the data based on the date (recent crimes hold greater weight), and crime index, and then we look at 1 hour intervals and find where the value is the highest and the lowest, and we can say that they lowest value is when a given area is most safe, and then at the highest, we can 
+	say when a given area is the least safe.  
+
+	This function is advanced because on an insertion or update it triggers a stored procedure, which will calculate the safest and 
+	least safe hour that for a given location. Furthermore, when values are inserted into the crimes database, we take the district id and 
+	the beat of the crime that was just input, and we recalculate the safest times for both district and beat, and we save those values again. 
+	We had to weigh the dates for this advanced function, and we use the same weighing from the crime index, to weigh each crime, so there is 
+	more data preprocessing being done here than in the crime index. We also had to implement all of the precomputation for Crime Index
+
+
+
+Email 2FA (Adv. Funct.)
+  This was a feature we deemed necessary for this project because our web application gives
+  the local law enforcement authorities the ability to add, remove, and modify crimes, which,
+  in the hands of the wrong person, could go very wrong. As such, we implemented a 2FA system for
+  all police in the police table (inherits from crimes). We generate a random integer, store it in the
+  police table, and keep it there for a short period of time, upon which the integer is deleted using a
+  SQL Trigger. We then send the user an email to the email they had specified with their law enforcement. We
+  don't allow police officers to register directly with the site because we don't have enough information to
+  verify their identity. The officer receives a code that they must input into the login page to get access
+  to police home. Upon logging in, the code is automatically removed from our police table so it cannot be used again.
+  If the wrong code is sent, we also deauthorize that code to ensure security.
+
+  This feature was an advanced Functionality due to all the possible state changes our web server had to account for.
+  Since logging into a website is not an asynchronous process, we had to account for what happens when the user
+  tries to login multiple times or tries to reuse an old verification code. We also had to establish a secure method
+  of protecting the sensitive data on the rest of our site, including setting up the use of a web token to authenticate our
+  protected queries. For the actual emailing, we used nodemailer, but the surrounding infrastructure we built was quite advanced. 
