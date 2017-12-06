@@ -126,6 +126,9 @@ class PoliceHome extends Component {
 		this.openInsertionModal = this.openInsertionModal.bind(this)
 		this.cancelInsertModal = this.cancelInsertModal.bind(this)
 		this.closeInsertModalWithInsert = this.closeInsertModalWithInsert.bind(this)
+		this.openEdit = this.openEdit.bind(this)
+		this.closeEditModal = this.closeEditModal.bind(this)
+		this.closeEditModalWithUpdate = this.closeEditModalWithUpdate.bind(this)
     this.state = {
       search_query : "",
       results : [],
@@ -141,7 +144,7 @@ class PoliceHome extends Component {
       district : null,
       street_name : "",
       selectedData : const_opts,
-
+			openEditmodal : false,
 
 			insertionModalOpen : false
 
@@ -154,6 +157,23 @@ class PoliceHome extends Component {
     // this.props.fbi_code must be attached with every request
     this.ogsearch()
   }
+
+	openEdit() {
+		this.setState({
+			openEditModal : true,
+			searchModalOpen : false
+		})
+	}
+
+	closeEditModal() {
+		this.setState({
+			openEditModal : false
+		})
+	}
+
+	closeEditModalWithUpdate() {
+    // All data is in this.state.selectedData
+	}
 
   handleDetailModalOpen(data){
     // selectedItem : data
@@ -400,6 +420,7 @@ class PoliceHome extends Component {
           <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
 					<Button id="modal-popup" onClick={this.openInsertionModal}> Report Crime </Button>
         </div>
+				<div className="modal-div">
 				<Modal open={this.state.insertionModalOpen} onClose={this.cancelInsertModal}>
           <Header content={"Advanced Search Options"} />
           <Modal.Content>
@@ -428,6 +449,8 @@ class PoliceHome extends Component {
 						<Button secondary content='Cancel' onClick={this.cancelInsertModal} />
           </Modal.Actions>
         </Modal>
+			</div>
+				<div className="modal-div">
         <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
           <Header content={"Advanced Search Options"} />
           <Modal.Content>
@@ -455,6 +478,7 @@ class PoliceHome extends Component {
             <Button secondary content='Search' onClick={this.closeSearchFilters} />
           </Modal.Actions>
         </Modal>
+			</div>
         <div className="map">
           <Map data={this.state.results}/>
         </div>
@@ -464,6 +488,7 @@ class PoliceHome extends Component {
           </List>
         </div>
       </div>
+			<div className="modal-div">
       <Modal open={this.state.detailModalOpen} onClose={this.handleDetailModalClose}>
         <Header content={"Advanced Search Options"} />
         <Modal.Content>
@@ -482,10 +507,41 @@ class PoliceHome extends Component {
         </Modal.Content>
         <Modal.Actions>
           <Button secondary content='Close' onClick={this.handleDetailModalClose} />
-          <Button secondary content='Edit' onClick={this.edit} />
+          <Button secondary content='Edit' onClick={this.openEdit} />
           <Button secondary content='Delete' onClick={this.remove} />
         </Modal.Actions>
       </Modal>
+		</div>
+			<div className="modal-div">
+			<Modal open={this.state.openEditModal} onClose={this.closeEditModal}>
+				<Header content={"Edit Crime"} />
+				<Modal.Content>
+					<div id="scroll-view">
+					<List horizontal link inverted>
+					</List>
+					<h2></h2>
+					<h3>Case Number</h3>
+					<Input focus value={this.state.case_number} onChange={this.handleCaseChange}/>
+					<h3>Description</h3>
+					<Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
+					<h3>Type</h3>
+					<Dropdown placeholder='Type' fluid search selection options={type_options} onChange={this.handleTypeChange.bind(this)}/>
+					<h3>Fbi Code</h3>
+					<Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
+					<h3>Arrest Made</h3>
+					 <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange={this.handleArrestChange.bind(this)}/>
+					<h3>District ID</h3>
+					<Dropdown placeholder='District' fluid selection options={district_options} onChange={this.handleDistrictChange.bind(this)}/>
+					<List selection divided inverted relaxed id="movieList">
+					</List>
+					</div>
+				</Modal.Content>
+				<Modal.Actions>
+					<Button secondary content='Update' onClick={this.closeEditModalWithUpdate} />
+					<Button secondary content='Cancel' onClick={this.closeEditModal} />
+				</Modal.Actions>
+			</Modal>
+		</div>
   </div>
   // todo change edit and delete buttons
   )
@@ -507,6 +563,7 @@ class PoliceHome extends Component {
         <div className="filter">
           <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
         </div>
+				<div className="modal-div">
         <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
           <Header content={"Advanced Search Options"} />
           <Modal.Content>
@@ -536,6 +593,7 @@ class PoliceHome extends Component {
             <Button secondary content='Search' onClick={this.closeSearchFilters} />
           </Modal.Actions>
         </Modal>
+				</div>
         <div className="map">
           <Map data={this.state.results}/>
         </div>
@@ -545,6 +603,7 @@ class PoliceHome extends Component {
           </List>
         </div>
       </div>
+			<div className="modal-div">
       <Modal open={this.state.detailModalOpen} onClose={this.handleDetailModalClose}>
         <Header content={"Advanced Search Options"} />
         <Modal.Content>
@@ -565,10 +624,12 @@ class PoliceHome extends Component {
           <Button secondary content='Close' onClick={this.handleDetailModalClose} />
         </Modal.Actions>
       </Modal>
+		</div>
   </div>
-  // todo change edit and delete buttons
+
   )
   }
+	// todo change edit and delete buttons
   // <CrimeDetailView
   //     mSelected={this.state.selectedItem}
   //     clearSelection={this.clearSelection}/>
