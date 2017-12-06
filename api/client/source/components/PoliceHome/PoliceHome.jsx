@@ -184,6 +184,72 @@ class PoliceHome extends Component {
 
 	closeEditModalWithUpdate() {
     // All data is in this.state.selectedData
+    var des = null
+    var type = null 
+    var fbi = null
+    var arrest = null
+    if(this.state.description == "")
+    {
+      des = this.state.selectedData['description']
+    }
+    else
+    {
+      des = this.state.description
+    }
+
+    if(this.state.type == "")
+    {
+      type = this.state.selectedData['type']
+    }
+    else
+    {
+      type = this.state.type
+    }
+
+    if(this.state.fbi_code == "")
+    {
+      fbi = this.state.selectedData['fbi_code']
+    }
+    else
+    {
+      fbi = this.state.fbi_code
+    }
+
+    if(this.state.arrest_made == null)
+    {
+      arrest = this.state.selectedData['arrest_made']
+    }
+    else
+    {
+      arrest = this.state.arrest_made
+    }
+    console.log(this.state.selectedData.id)
+    let data = {"description":des,
+    "type":type,
+    "fbi_code":fbi,
+    "arrest_made" : arrest,
+    "id" : this.state.selectedData.id
+    }
+    var headers = {
+      "contentType" : "application/json"
+    }
+      console.log(this.state)
+      var q = this.state.selectedID
+      axios.put("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q, data, headers)
+        .then(function (response) {
+          this.setState({
+            description : "",
+            type : "",
+            fbi_code : "",
+            arrest_made : null,
+          },
+          this.closeEditModal(),
+          this.ogsearch())
+        }.bind(this))
+        .catch(function (error) {
+          console.log(error)
+
+    })
 	}
 
   handleDetailModalOpen(data){
@@ -306,7 +372,6 @@ class PoliceHome extends Component {
   handleChange(event) {
     if(event.target.value === "") {
       this.setState({
-        search_query :  "",
         results : []
       })
     }
@@ -611,8 +676,6 @@ class PoliceHome extends Component {
 					<List horizontal link inverted>
 					</List>
 					<h2></h2>
-					<h3>Case Number</h3>
-					<Input focus value={this.state.case_number} onChange={this.handleCaseChange}/>
 					<h3>Description</h3>
 					<Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
 					<h3>Type</h3>
@@ -621,8 +684,6 @@ class PoliceHome extends Component {
 					<Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
 					<h3>Arrest Made</h3>
 					 <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange={this.handleArrestChange.bind(this)}/>
-					<h3>District ID</h3>
-					<Dropdown placeholder='District' fluid selection options={district_options} onChange={this.handleDistrictChange.bind(this)}/>
 					<List selection divided inverted relaxed id="movieList">
 					</List>
 					</div>
