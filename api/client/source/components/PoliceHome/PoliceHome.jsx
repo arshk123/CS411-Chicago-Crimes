@@ -123,6 +123,9 @@ class PoliceHome extends Component {
     this.handleDetailModalClose = this.handleDetailModalClose.bind(this)
     this.edit = this.edit.bind(this)
     this.remove = this.remove.bind(this)
+		this.openInsertionModal = this.openInsertionModal.bind(this)
+		this.cancelInsertModal = this.cancelInsertModal.bind(this)
+		this.closeInsertModalWithInsert = this.closeInsertModalWithInsert.bind(this)
     this.state = {
       search_query : "",
       results : [],
@@ -137,7 +140,12 @@ class PoliceHome extends Component {
       arrest_made : null,
       district : null,
       street_name : "",
-      selectedData : const_opts
+      selectedData : const_opts,
+
+
+			insertionModalOpen : false
+
+
     }
     if(this.props.fbi_code) {
       fbicode = this.props.fbi_code
@@ -273,6 +281,31 @@ class PoliceHome extends Component {
     }
   }
 
+
+
+
+
+
+	openInsertionModal() {
+		this.setState({
+			insertionModalOpen : true
+		})
+	}
+
+	cancelInsertModal() {
+		this.setState({
+			insertionModalOpen : false
+		})
+	}
+
+	closeInsertModalWithInsert() {
+		this.setState({
+			insertionModalOpen : false
+		})
+	}
+
+
+
   openSearchFilters() {
     this.setState({
       searchModalOpen : true,
@@ -295,8 +328,6 @@ class PoliceHome extends Component {
   }
 
   search() {
-    // case_number=HZ566343&type=theft&description=OVER&district_id=14&arrest_made=false
-    // TODO write state handlers for dropdown types (district and arrest_made)
     console.log("searching ")
     axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes",  {
       params: {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district}
@@ -359,10 +390,6 @@ class PoliceHome extends Component {
     <div className="Home">
       <div className="navbar" id="nav">
         <Button id="popup-button"> POPUPS </Button>
-        <Button id="carousel-button"> SLIDES </Button>
-        <Button id="video-button"> SHOTS </Button>
-        <Button id="multi-column-button"> BEANS </Button>
-        <Button id="home-button"> HOME </Button>
       </div>
       <div className="content-container">
         <div className="search">
@@ -371,7 +398,36 @@ class PoliceHome extends Component {
         </div>
         <div className="filter">
           <Button id="modal-popup" onClick={this.openSearchFilters}> Search Options </Button>
+					<Button id="modal-popup" onClick={this.openInsertionModal}> Report Crime </Button>
         </div>
+				<Modal open={this.state.insertionModalOpen} onClose={this.cancelInsertModal}>
+          <Header content={"Advanced Search Options"} />
+          <Modal.Content>
+            <div id="scroll-view">
+            <List horizontal link inverted>
+            </List>
+            <h2></h2>
+            <h3>Case Number</h3>
+            <Input focus value={this.state.case_number} onChange={this.handleCaseChange}/>
+            <h3>Description</h3>
+            <Input focus value={this.state.description} onChange={this.handleDescriptionChange}/>
+            <h3>Type</h3>
+            <Dropdown placeholder='Type' fluid search selection options={type_options} onChange={this.handleTypeChange.bind(this)}/>
+            <h3>Fbi Code</h3>
+            <Input focus value={this.state.fbi_code} onChange={this.handleFbiChange}/>
+            <h3>Arrest Made</h3>
+             <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange={this.handleArrestChange.bind(this)}/>
+            <h3>District ID</h3>
+            <Dropdown placeholder='District' fluid selection options={district_options} onChange={this.handleDistrictChange.bind(this)}/>
+            <List selection divided inverted relaxed id="movieList">
+            </List>
+            </div>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button secondary content='Insert' onClick={this.closeInsertModalWithInsert} />
+						<Button secondary content='Cancel' onClick={this.cancelInsertModal} />
+          </Modal.Actions>
+        </Modal>
         <Modal open={this.state.searchModalOpen} onClose={this.closeSearchFilters}>
           <Header content={"Advanced Search Options"} />
           <Modal.Content>
