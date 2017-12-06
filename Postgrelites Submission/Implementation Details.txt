@@ -1,0 +1,3 @@
+Node.js Backend with Express running on a Postgres Database
+Front end is React.js mostly built on Semantic-UI
+Running server with a supervisor process reverse proxied through nginx
