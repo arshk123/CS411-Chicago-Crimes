@@ -83,7 +83,7 @@ class PoliceLogin extends Component {
     .catch(function (error) {
       console.log(error)
       this.showFailedLogin()
-    });
+    }.bind(this));
   }
 
   handleUserNameChange(event) {
@@ -118,7 +118,13 @@ class PoliceLogin extends Component {
     }
     if(this.state.verCodeInput) {
       return(
-        <div>
+        <div id="loginParent">
+          <Grid
+          textAlign='center'
+          style={{ height: '100%' }}
+          verticalAlign='middle'
+          >
+            <Grid.Column style={{ maxWidth: 450 }}>
           <Form size="large">
             <Form.Input
               fluid
@@ -138,6 +144,8 @@ class PoliceLogin extends Component {
 
             <Button color='teal' fluid size='large' onClick={this.loginPoliceVerify} type='submit'> Submit</Button>
           </Form>
+        </Grid.Column>
+       </Grid>
         </div>
       )
     }
@@ -146,7 +154,7 @@ class PoliceLogin extends Component {
       text = "Invalid Username or Password"
     }
     return (
-      <div>
+      <div id="loginParent">
       <Grid
       textAlign='center'
       style={{ height: '100%' }}
@@ -154,7 +162,7 @@ class PoliceLogin extends Component {
       >
       <Grid.Column style={{ maxWidth: 450 }}>
         <Header as='h2' color='teal' textAlign='center'>
-          {' '}Sign in to your account
+          {' '}Sign in to your Account
         </Header>
         <Form size="large">
           <Segment stacked>
@@ -168,6 +176,7 @@ class PoliceLogin extends Component {
             placeholder='Password'
             onChange={this.handlePasswordChange}
           />
+        {text}
 
           <Button color='teal' fluid size='large' onClick={this.loginPolice} type='submit'> Submit</Button>
           <Button color='teal' fluid size='large' onClick={this.showVerificationInput} type='submit'> Already Have a Code? </Button>

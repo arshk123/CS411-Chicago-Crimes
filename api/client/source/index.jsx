@@ -8,6 +8,7 @@ import PoliceHome from './components/PoliceHome/PoliceHome.jsx'
 import Map from './components/Map/Map.jsx'
 import Login from './components/Login/Login.jsx'
 import PoliceLogin from './components/Login/PoliceLogin/PoliceLogin.jsx'
+import Home from './components/Home/Home.jsx'
 
 // Include any new stylesheets here
 // Note that components' stylesheets should NOT be included here.
@@ -20,7 +21,7 @@ render(
       <Route exact path="/" component={Login}/>
       <Route exact path="/map" component={Map}/>
       <Route exact path="/login" component={Map}/>
-      <Route exact path="/civilian" component={Map}/>
+      <Route exact path="/civilian" component={Home}/>
       <Route exact path="/policelogin" component={PoliceLogin}/>
       <Route exact path="/policehome" component={PoliceHome}/>
     </Switch>

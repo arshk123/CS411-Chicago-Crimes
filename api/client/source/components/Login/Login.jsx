@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from 'semantic-ui-react'
+import { Button, Image, Segment } from 'semantic-ui-react'
 
 class Login extends Component {
   constructor(props) {
@@ -20,19 +20,27 @@ class Login extends Component {
   render() {
     return (
       <div id="loginParent">
-        <h2> Chicago Crime Tracker </h2>
-        <div id="loginChild">
+        <Segment>
+          <h2> Chicago Crime Tracker </h2>
+          <div id="images">
+          <Image src="/assets/chicago-pd.png" size="medium" centered/>
+          </div>
+          <div id="loginChild">
+
+        </div>
+      </Segment>
+      <Segment>
         <Link to="/civilian">
-          <Button onClick={this.loginCivilian}>
+          <Button color='teal' fluid onClick={this.loginCivilian}>
             Civilian
           </Button>
         </Link>
         <Link to="/policelogin">
-          <Button onClick={this.loginPolice}>
+          <Button color='teal' fluid onClick={this.loginPolice}>
             Police
           </Button>
         </Link>
-      </div>
+      </Segment>
       </div>
     )
   }
