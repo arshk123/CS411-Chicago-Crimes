@@ -57,7 +57,7 @@ router.route('/crimes').get(function(req,res) {
     our_query += `fbi_code = \'${req.query.fbi_code}\'`
   }
   console.log(our_query);
-  if(our_query === 'SELECT * FROM crimes where ') {
+  if(our_query === 'SELECT * FROM crimes where ' || our_query === "SELECT * FROM crimes where case_number='undefined' AND description LIKE '%undefined%' AND type='undefined' AND fbi_code = 'undefined'") {
     // res.status(200).send({
     //   message: 'ok',
     //   data: [{"data" : { "rows" : []}}]
@@ -88,8 +88,12 @@ router.route('/crimes/:type').get(function(req, res) {
   type = req.params.type.toUpperCase();
   var client = new pg.Client(secrets.db);
   client.connect();
-  console.log(`SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' LIMIT 25`)
-  client.query(`SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' LIMIT 25`, (err, response) => {
+  q = 'SELECT * FROM crimes WHERE type LIKE \'\%${type}\%\' ORDER BY TYPE LIMIT 25'
+  if(type === "") {
+    q = 'SELECT * FROM crimes ORDER BY time DESC LIMIT 25'
+  }
+  console.log(q)
+  client.query(q, (err, response) => {
     client.end()
     if(!err) {
       console.log(response)

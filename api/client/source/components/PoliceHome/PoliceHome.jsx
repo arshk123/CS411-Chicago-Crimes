@@ -29,6 +29,7 @@ let const_opts = {
 }
 
 let type_options = [
+    { value: '', text: 'Search'},
     { value: 'OTHER OFFENSE', text: 'Other Offense'},
     { value: 'PROSTITUTION', text: 'Prostitution'},
     { value: 'THEFT', text: 'Theft'},
@@ -143,6 +144,7 @@ class PoliceHome extends Component {
     }
     fbicode = "06"
     // this.props.fbi_code must be attached with every request
+    this.ogsearch()
   }
 
   handleDetailModalOpen(data){
@@ -253,8 +255,11 @@ class PoliceHome extends Component {
   handleOuterTypeChange(event, data : any) {
     if(data.value === "") {
       this.setState({
-        search_query :  "",
-        results : []
+        search_query : data.value
+      }, () => {
+        // query search
+        this.ogsearch()
+        console.log(this.state.search_query)
       })
     }
     else {
@@ -328,7 +333,9 @@ class PoliceHome extends Component {
   ogsearch() {
     var q = this.state.search_query
     console.log("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
-    axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes/" + q)
+    axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes",  {
+      params: {"case_number" : "", "description" : "", "type" : this.state.search_query, "fbi_code" : "", "arrest_made" : null, "district_id": null}
+    })
     .then(function (response) {
       // console.log(JSON.stringify(response.data["data"]["rows"]))
       this.setState({
