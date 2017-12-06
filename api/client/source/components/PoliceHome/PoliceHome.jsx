@@ -129,7 +129,13 @@ class PoliceHome extends Component {
 		this.openEdit = this.openEdit.bind(this)
 		this.closeEditModal = this.closeEditModal.bind(this)
 		this.closeEditModalWithUpdate = this.closeEditModalWithUpdate.bind(this)
-    this.state = {
+    this.handleLatChange = this.handleLatChange.bind(this)
+    this.handleLngChange = this.handleLngChange.bind(this)
+    this.handleWardChange = this.handleWardChange.bind(this)
+    this.handleBeatChange = this.handleBeatChange.bind(this)
+    this.handleBlockChange = this.handleBlockChange.bind(this)
+    this.handlePoliceChange = this.handlePoliceChange.bind(this)
+ this.state = {
       search_query : "",
       results : [],
       selectedItem : false,
@@ -141,11 +147,16 @@ class PoliceHome extends Component {
       type : "",
       fbi_code : "",
       arrest_made : null,
-      district : null,
-      street_name : "",
+      district_id : null,
       selectedData : const_opts,
 			openEditmodal : false,
 
+      latitude :null,
+      longitude:null,
+      ward :null,
+      beat:null,
+      block:null,
+      police_id:null,
 			insertionModalOpen : false
 
 
@@ -153,7 +164,7 @@ class PoliceHome extends Component {
     if(this.props.fbi_code) {
       fbicode = this.props.fbi_code
     }
-    fbicode = "06"
+    fbicode = ""
     // this.props.fbi_code must be attached with every request
     this.ogsearch()
   }
@@ -228,11 +239,41 @@ class PoliceHome extends Component {
 
   handleDistrictChange(event, data : any) {
     console.log(data.value)
-    this.setState({district : data.value});
+    this.setState({district_id : data.value});
   }
 
   handleStreetChange(event) {
     this.setState({street_name : event.target.value});
+  }
+
+  handleLatChange(event)
+  {
+    this.setState({latitude : event.target.value})
+  }
+
+  handleLngChange(event)
+  {
+    this.setState({longitude : event.target.value})
+  }
+
+  handleWardChange(event)
+  {
+    this.setState({ward : event.target.value})
+  }
+
+  handleBlockChange(event)
+  {
+    this.setState({block : event.target.value})
+  }
+
+  handleBeatChange(event)
+  {
+    this.setState({beat : event.target.value})
+  }
+
+  handlePoliceChange(event)
+  {
+    this.setState({police_id:event.target.value})
   }
 
   selectedItem(data) {
@@ -318,9 +359,47 @@ class PoliceHome extends Component {
 		})
 	}
 
+
+
 	closeInsertModalWithInsert() {
-		this.setState({
-			insertionModalOpen : false
+    let data = {"description":this.state.description,
+    "type":this.state.type,
+    "fbi_code":this.state.fbi_code,
+    "arrest_made" : this.state.arrest_made,
+    "case_number" : this.state.case_number,
+    "police_id":this.state.police_id,
+    "latitude": this.state.latitude,
+    "longitude":this.state.longitude,
+     "ward":this.state.ward,
+    "beat":this.state.beat,
+    "block":this.state.block,
+    "district_id":this.state.district_id
+    }
+		var headers = {
+      "contentType" : "application/json"
+    }
+      console.log(this.state)
+      axios.post("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes", data, headers)
+        .then(function (response) {
+          this.setState({
+            case_number : "",
+            description : "",
+            type : "",
+            fbi_code : "",
+            arrest_made : null,
+            district_id : null,
+            selectedData : const_opts,
+            latitude :0.0,
+            longitude:0.0,
+            ward :0,
+            beat:0,
+            block:0,
+            insertionModalOpen : false
+          })
+        }.bind(this))
+        .catch(function (error) {
+          console.log(error)
+
 		})
 	}
 
@@ -334,7 +413,7 @@ class PoliceHome extends Component {
       type : "",
       fbi_code : "",
       arrest_made : null,
-      district : null,
+      district_id : null,
       street_name : ""
     })
   }
@@ -350,7 +429,7 @@ class PoliceHome extends Component {
   search() {
     console.log("searching ")
     axios.get("http://fa17-cs411-10.cs.illinois.edu:8280/api/crimes",  {
-      params: {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district}
+      params: {"case_number" : this.state.case_number, "description" : this.state.description, "type" : this.state.type, "fbi_code" : this.state.fbi_code, "arrest_made" : this.state.arrest_made, "district_id": this.state.district_id}
     })
     .then(function (response) {
       this.setState({
@@ -440,6 +519,18 @@ class PoliceHome extends Component {
              <Dropdown placeholder='Arrest' fluid selection options={arrest_made_options} onChange={this.handleArrestChange.bind(this)}/>
             <h3>District ID</h3>
             <Dropdown placeholder='District' fluid selection options={district_options} onChange={this.handleDistrictChange.bind(this)}/>
+            <h3>Latitude</h3>
+            <Input focus value={this.state.latitude} onChange={this.handleLatChange}/>
+            <h3>Longitude</h3>
+            <Input focus value={this.state.longitude} onChange={this.handleLngChange}/>
+            <h3>Ward</h3>
+            <Input focus value={this.state.ward} onChange={this.handleWardChange}/>
+            <h3>Beat</h3>
+            <Input focus value={this.state.beat} onChange={this.handleBeatChange}/>
+            <h3>Block</h3>
+            <Input focus value={this.state.block} onChange={this.handleBlockChange}/>
+            <h3>Police ID</h3>
+            <Input focus value={this.state.police_id} onChange={this.handlePoliceChange}/>
             <List selection divided inverted relaxed id="movieList">
             </List>
             </div>
