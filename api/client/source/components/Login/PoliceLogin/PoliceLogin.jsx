@@ -134,6 +134,7 @@ class PoliceLogin extends Component {
           <Form.Input
             fluid
             placeholder='Password'
+            type='password'
             onChange={this.handlePasswordChange}
           />
          <Form.Input
@@ -174,6 +175,7 @@ class PoliceLogin extends Component {
           <Form.Input
             fluid
             placeholder='Password'
+            type='password'
             onChange={this.handlePasswordChange}
           />
         {text}
