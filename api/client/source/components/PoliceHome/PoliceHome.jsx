@@ -160,7 +160,7 @@ class PoliceHome extends Component {
 			insertionModalOpen : false,
 			selectedPoliceOfficer : "",
 			selectedBeatMinMax : "",
-			selectedMinMax : ""
+			selectedDistrictMinMax : ""
 
 		}
 		// selectedPoliceOfficer : response.data.rows["police_name"],
@@ -275,7 +275,7 @@ class PoliceHome extends Component {
 			this.setState({
 				selectedPoliceOfficer : response.data.data.rows[0]["police_name"],
 				selectedBeatMinMax : response.data.data.rows[0]["beat_minmax"],
-				districtMinMax : response.data.data.rows[0]["district_minmax"],
+				selectedDistrictMinMax : response.data.data.rows[0]["district_minmax"],
 				detailModalOpen : true,
 				selectedItem : true,
 				selectedID : data["crime_id"],
@@ -703,7 +703,7 @@ class PoliceHome extends Component {
 								<h3>Beat Minimum and Maximum Crime Index</h3>
 								<h4>{this.state.selectedBeatMinMax}</h4>
 								<h3>Location Minimum and Maximum Crime</h3>
-								<h4>{this.state.selectedMinMax}</h4>
+								<h4>{this.state.selectedDistrictMinMax}</h4>
 								<List selection divided inverted relaxed id="movieList"> </List>
 							</Modal.Content>
 							<Modal.Actions>
