@@ -61,12 +61,12 @@ router.route('/crimes').get(function(req,res) {
   }
   console.log(our_query);
   if(our_query === 'SELECT * FROM crimes where ' || our_query === "SELECT * FROM crimes where case_number='undefined' AND description LIKE '%undefined%' AND type='undefined' AND fbi_code = 'undefined'") {
-   // res.status(200).send({
+    // res.status(200).send({
     //  message: 'ok',
-     // data: [{"data" : { "rows" : []}}]
-   // })
-   our_query = 'SELECT * FROM crimes ORDER BY time DESC'
-   console.log('empty args')
+    // data: [{"data" : { "rows" : []}}]
+    // })
+    our_query = 'SELECT * FROM crimes ORDER BY time DESC'
+    console.log('empty args')
   }
   // Execute query
   client.query(our_query + ' LIMIT 70;', (err, response) => {
@@ -97,7 +97,7 @@ router.route('/crimes/:id_details').get(function(req, res) {
   client.query(`SELECT crimes.id, crimes.crime_id, crimes.case_number, crimes.description, crimes.time, crimes.type, crimes.fbi_code, crimes.arrest_made, crimes.district_id, police.name AS police_name, crimes.latitude, crimes.longitude, crimes.ward, crimes.beat, crimes.block, crimes.crime_index, beat_minmax_values.minmax AS beat_minmax, district_minmax_values.minmax AS district_minmax FROM ((crimes LEFT JOIN police ON (crimes.police_id = police.police_id)) LEFT JOIN beat_minmax_values ON (crimes.beat = beat_minmax_values.beat)) LEFT JOIN district_minmax_values ON (crimes.district_id = district_minmax_values.district_id) WHERE id=${id_details};`, (err, response) => {
     client.end()
     if(!err) {
-//      console.log(response.data)
+      //      console.log(response.data)
       res.status(200).send({
         message : 'ok',
         data: response
@@ -144,47 +144,47 @@ router.route('/crimes').post(function(req, res) {
   var crime_index = null
   console.log(req.query['arrest_made'])
   if (req.query['description'] != undefined){
-  	description = req.query.description 
+    description = req.query.description
   }
   if (req.query['type'] != undefined){
-        type = req.query.type
+    type = req.query.type
   }
   if (req.query['fbi_code'] != undefined){
-        fbi_code = req.query.fbi_code 
+    fbi_code = req.query.fbi_code
   }
   if (req.query['arrest_made'] != undefined){
-        arrest_made = req.query.arrest_made
+    arrest_made = req.query.arrest_made
   }
   if (req.query['case_number'] != undefined){
-        case_number = req.query.case_number
+    case_number = req.query.case_number
   }
   if (req.query['district_id']!= undefined){
-        district_id = req.query.district_id
+    district_id = req.query.district_id
   }
   if (req.query['police_id']!= undefined){
-        police_id = req.query.police_id 
+    police_id = req.query.police_id
   }
   if (req.query['latitude']!= undefined){
-        latitude = req.query.latitude
+    latitude = req.query.latitude
   }
   if (req.query['longitude']!= undefined){
-        longitude = req.query.longitude
+    longitude = req.query.longitude
   }
   if (req.query['ward'] != undefined){
-        ward = req.query.ward
+    ward = req.query.ward
   }
   if (req.query['beat']!= undefined){
-        beat = req.query.beat
+    beat = req.query.beat
   }
   if (req.query['block']!= undefined){
-        block = req.query.block
+    block = req.query.block
   }
   if (req.query['crime_index']!= undefined){
-        crime_index = req.query.crime_index
+    crime_index = req.query.crime_index
   }
 
   console.log(`INSERT into crimes(description, type, fbi_code, arrest_made, case_number, time, district_id, police_id, latitude, longitude, ward, beat, block, crime_index) values( \'${description}\', \'${type}\', \'${fbi_code}\', ${arrest_made}, \'${case_number}\', ${time}, ${district_id}, ${police_id}, ${latitude}, ${longitude}, ${ward}, ${beat}, ${block}, ${crime_index})`)
-  client.query(`INSERT into crimes(description, type, fbi_code, arrest_made, case_number, time, district_id, police_id, latitude, longitude, ward, beat, block, crime_index) values( \'${description}\', \'${type}\', \'${fbi_code}\', ${arrest_made}, \'${case_number}\', ${time}, ${district_id}, ${police_id}, ${latitude}, ${longitude}, ${ward}, ${beat}, ${block}, ${crime_index})`,( err, response) => {
+  client.query(`INSERT into crimes(description, type, fbi_code, arrest_made, case_number, time, district_id, police_id, latitude, longitude, ward, beat, block, crime_index) values( \'${description}\', \'${type}\', \'${fbi_code}\', ${arrest_made}, \'${case_number}\', ${time}, ${district_id}, ${police_id}, ${latitude}, ${longitude}, ${ward}, ${beat}, \'${block}\', ${crime_index})`,( err, response) => {
     client.end()
     if(!err) {
       res.status(200).send({

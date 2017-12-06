@@ -16,11 +16,12 @@ var transporter = nodemailer.createTransport({
 
 // console.log(random_num_generator())
 
+
 module.exports = function(router) {
   router.route('/login').post(function(req,res) {
-    //	console.log(req.query);
-    //	console.log(req)
-    //	console.log(req.body);
+    //  console.log(req.query);
+    //  console.log(req)
+    //  console.log(req.body);
     if("username" in req.body) {
       req.query = req.body
     }
@@ -41,7 +42,7 @@ module.exports = function(router) {
           console.log("ok");
           // send ok
           client.query(`Update police set email_verification=null WHERE username=\'${req.query.username}\'`, (e,r)=>{
-		console.log("removed");
+                console.log("removed");
 });
           res.status(200).send({
             message: "Verification code validated",
@@ -57,7 +58,7 @@ module.exports = function(router) {
       client.connect()
       //console.log(`Select * FROM police WHERE username = \'${req.query.username}\'`)
       client.query(`Select * FROM police WHERE username = \'${req.query.username}\' and password = \'${req.query.password}\'`, (err, response) => {
-        //	console.log(response)
+        //      console.log(response)
         console.log(response.rows);
         console.log(response.rowCount);
         if(err || response.rowCount != 1) {
@@ -108,3 +109,4 @@ module.exports = function(router) {
   })
   return router
 }
+                               
